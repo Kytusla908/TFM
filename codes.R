@@ -1,3 +1,6 @@
+# Libraries ============
+
+
 # Input archives reading
 data_chembl <- read.csv("data/data.csv",sep = ";",dec = ".")
 data <- read.csv("data/CHEMBL4372_Desc.csv",sep = ",",dec = ".")
@@ -15,11 +18,15 @@ variables_0.85 <- variables[, !apply(cor_matrix, 2,
                                     function(x) any(abs(x) > 0.85, na.rm = TRUE))]
 variables_0.9 <- variables[, !apply(cor_matrix, 2,
                                     function(x) any(abs(x) > 0.9, na.rm = TRUE))]
-cat("N? Variables usando 0.8 como punto de corte: ", ncol(variables_0.8),
-      "\nN? Variables usando 0.85 como punto de corte: ", ncol(variables_0.85),
-      "\nN? Variables usando 0.9 como punto de corte: ", ncol(variables_0.9))
+cat("No of variables after setting 0.8 as cut-off: ", ncol(variables_0.8),
+      "\nNo of variables after setting 0.85 as cut-off: ", ncol(variables_0.85),
+      "\nNo of variables after setting 0.9 as cut-off: ", ncol(variables_0.9))
 
 # Variance based Feature Selection ==========
-
-
+variances <- data.frame(t(apply(variables_0.8, 2, var)))
+removed_var <- colnames(variances)[which((!abs(variances) > 0))]
+input <- variables_0.8[,apply(variances, 2,
+                               function(x) any(abs(x) > 0, na.rm = TRUE))]
+cat("Variable No. after eliminating variance = 0: ", ncol(input),
+    "\nEliminated variables: ", removed_var)
 
