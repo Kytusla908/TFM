@@ -63,6 +63,17 @@ ggplot(melt(input), aes(x = variable, y = value)) +
   geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust=1))
 dev.off()
 
-
+# Define the labels
+for (i in 1:nrow(data)) {
+  #Std.value equal or bigger than 11000 will set as active
+  if (data$Standard.Value[i] >= 11000){  
+    data$labels[i] = 1  # label 1 = active
+  }
+  else {
+    data$labels[i] = 0  # label 0 = inactive
+    }
+}
+table(data$labels)
+prop.table(table(data$labels))
 
 
