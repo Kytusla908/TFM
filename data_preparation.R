@@ -3,8 +3,6 @@ library(ggplot2)
 library(reshape2)
 library(dplyr)
 library(class)
-library(caret)
-library(naivebayes)
 
 # Input archives reading
 data_chembl <- read.csv("data/data.csv",sep = ";",dec = ".")
@@ -118,41 +116,4 @@ ggplot(all_sets,aes(x=Label, y=Freq, fill = Label)) +
 norm_data <- subset(norm_data, select = -c(id))
 train <- subset(train, select = -c(id))
 test <- subset(test, select = -c(id))
-
-
-# k-NN model ==========
-# Automated paramenter tuning
-grid <- expand.grid(k = c(1,3,5,7,15,21,27,35))
-model <- train(label ~ ., data = norm_data,
-               method = "knn", tuneGrid = grid)
-model
-
-# Prediction model
-kNN_model21_pred <- knn(train = train[-1], test = test[-1],
-                      cl = train[[1]], k = 5)
-table(kNN_model21_pred == test[[1]])
-confusionMatrix(kNN_model21_pred, test[[1]], 
-                positive = "1")
-
-
-# Naive Bayes ============
-# Automated paramenter tuning
-modelLookup("naive_bayes")
-grid <- expand.grid(usekernel = c(TRUE, FALSE),
-                    laplace = c(0,0.5,1),
-                    adjust = c(0,0.5,1))
-model <- train(label ~ ., data = norm_data,
-               method = "naive_bayes", tuneGrid = grid)
-model
-
-# Prediction model
-NaiveBayes_model <- naive_bayes(label ~ ., data=train,
-                                laplace = 0, usekernel=F)
-NaiveBayes_pred <- predict(NaiveBayes_model, test[-1])
-table(NaiveBayes_pred == test[[1]])
-confusionMatrix(NaiveBayes_pred, test[[1]], 
-                positive = "1")
-
-
-
 
