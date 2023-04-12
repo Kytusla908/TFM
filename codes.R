@@ -2,6 +2,9 @@
 library(ggplot2)
 library(reshape2)
 library(dplyr)
+library(class)
+library(caret)
+library(naivebayes)
 
 # Input archives reading
 data_chembl <- read.csv("data/data.csv",sep = ";",dec = ".")
@@ -66,15 +69,18 @@ ggplot(melt(norm_data), aes(x = variable, y = value)) +
 
 
 # Define labels =========
+label <- c()
 for (i in 1:nrow(data)) {
   #Std.value equal or bigger than 11000 will set as active
   if (data$Standard.Value[i] >= 11000){  
-    norm_data$label[i] = 1  # label 1 = active
+    label[i] = 1  # label 1 = active
   }
   else {
-    norm_data$label[i] = 0  # label 0 = inactive
+    label[i] = 0  # label 0 = inactive
     }
 }
+norm_data <- cbind(label, norm_data)
+norm_data$label <- as.factor(norm_data$label)
 table(norm_data$label)
 prop.table(table(norm_data$label))
 
@@ -94,13 +100,13 @@ test_prop <- as.data.frame(prop.table(table(test$label)))
 colnames(test_prop)[1] <- c("test_prop")
 
 # Barplot to compare proportions
-all_sets <- list(complete_set_prop, train_prop, test_prop)
-all_sets <- lapply(all_sets, function(dat) {
+all_sets <- list(complete_set_prop, train_prop, test_prop)  # Setting all tables to the same data frame
+all_sets <- lapply(all_sets, function(dat) {  # Add "type" and "label" column
   dat$type <- colnames(dat)[1]
   colnames(dat)[1] <- "Label"
   dat
 })
-all_sets <- do.call(rbind, all_sets)
+all_sets <- do.call(rbind, all_sets)  # Include all tables to the same data frame
 # pdf(file = "plots/prop_table_sets.pdf")
 ggplot(all_sets,aes(x=Label, y=Freq, fill = Label)) +
   geom_col() + 
@@ -115,11 +121,37 @@ test <- subset(test, select = -c(id))
 
 
 # k-NN model ==========
+# Automated paramenter tuning
+grid <- expand.grid(k = c(1,3,5,7,15,21,27,35))
+model <- train(label ~ ., data = norm_data,
+               method = "knn", tuneGrid = grid)
+model
+
+# Prediction model
+kNN_model21_pred <- knn(train = train[-1], test = test[-1],
+                      cl = train[[1]], k = 5)
+table(kNN_model21_pred == test[[1]])
+confusionMatrix(kNN_model21_pred, test[[1]], 
+                positive = "1")
 
 
+# Naive Bayes ============
+# Automated paramenter tuning
+modelLookup("naive_bayes")
+grid <- expand.grid(usekernel = c(TRUE, FALSE),
+                    laplace = c(0,0.5,1),
+                    adjust = c(0,0.5,1))
+model <- train(label ~ ., data = norm_data,
+               method = "naive_bayes", tuneGrid = grid)
+model
 
-
-
+# Prediction model
+NaiveBayes_model <- naive_bayes(label ~ ., data=train,
+                                laplace = 0, usekernel=F)
+NaiveBayes_pred <- predict(NaiveBayes_model, test[-1])
+table(NaiveBayes_pred == test[[1]])
+confusionMatrix(NaiveBayes_pred, test[[1]], 
+                positive = "1")
 
 
 
