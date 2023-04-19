@@ -70,7 +70,7 @@ ggplot(melt(norm_data), aes(x = variable, y = value)) +
 #dev.off()
 
 # print out into the same pdf
-'''
+'
 library(gridExtra)
 p <- ggplot(melt(data_df), aes(x = variable, y = value)) +
   labs(title = "Descriptors values distribution boxplot", x = "Descriptors", tag = "A") + 
@@ -86,7 +86,7 @@ q <- ggplot(melt(norm_data), aes(x = variable, y = value)) +
 pdf(file = "plots/melted_boxplot.pdf", onefile = TRUE, width = 15, height = 16)
 grid.arrange(p,q)
 dev.off()
-'''
+'
 
 # Define labels =========
 label <- c()
