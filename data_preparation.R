@@ -43,10 +43,12 @@ cat("Variable No. after eliminating variance = 0: ", ncol(data_df),
     "\nEliminated variables: ", removed_var)
 
 # First description of the variables ==============
-# pdf(file = "plots/boxplot_variables_1.pdf", width = 15, height = 8)
+#pdf(file = "plots/boxplot_variables_1.pdf", width = 15, height = 8)
 ggplot(melt(data_df), aes(x = variable, y = value)) +
-  geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust=1))
-# dev.off()
+  labs(title = "Descriptors values distribution boxplot", x = "Descriptors") + 
+  geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust=1),
+                         plot.title = element_text(size = 22, hjust = 0.5))
+#dev.off()
 
 
 # Normalization =========
@@ -60,11 +62,31 @@ normalize(c(10, 20, 30, 40, 50))
 norm_data <- as.data.frame(lapply(data_df, normalize))
 
 # boxplot normalized data
-# pdf(file = "plots/boxplot_variables_2.pdf", width = 15, height = 8)
+#pdf(file = "plots/boxplot_variables_2.pdf", width = 15, height = 8)
 ggplot(melt(norm_data), aes(x = variable, y = value)) +
-  geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust=1))
-# dev.off()
+  labs(title = "Normalized descriptors values distribution boxplot", x = "Descriptors") + 
+  geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust=1),
+                         plot.title = element_text(size = 22, hjust = 0.5))
+#dev.off()
 
+# print out into the same pdf
+'''
+library(gridExtra)
+p <- ggplot(melt(data_df), aes(x = variable, y = value)) +
+  labs(title = "Descriptors values distribution boxplot", x = "Descriptors", tag = "A") + 
+  geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust=1),
+                         plot.title = element_text(size = 22, hjust = 0.5),
+                         plot.tag = element_text(size = 16))
+  
+q <- ggplot(melt(norm_data), aes(x = variable, y = value)) +
+  labs(title = "Normalized descriptors values distribution boxplot", x = "Descriptors", tag = "B") +
+  geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust=1),
+                         plot.title = element_text(size = 22, hjust = 0.5),
+                         plot.tag = element_text(size = 16))
+pdf(file = "plots/melted_boxplot.pdf", onefile = TRUE, width = 15, height = 16)
+grid.arrange(p,q)
+dev.off()
+'''
 
 # Define labels =========
 label <- c()
@@ -105,11 +127,11 @@ all_sets <- lapply(all_sets, function(dat) {  # Add "type" and "label" column
   dat
 })
 all_sets <- do.call(rbind, all_sets)  # Include all tables to the same data frame
-# pdf(file = "plots/prop_table_sets.pdf")
+#pdf(file = "plots/prop_table_sets.pdf")
 ggplot(all_sets,aes(x=Label, y=Freq, fill = Label)) +
   geom_col() + 
   facet_wrap(~ type, scales = "free_x")
-# dev.off()
+#dev.off()
 
 
 # Remove temporary variable
