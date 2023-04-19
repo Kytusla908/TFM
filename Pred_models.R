@@ -146,7 +146,7 @@ RF_model
 # Performance plot
 RF_plot <- ggplot(RF_model) +
   labs(title = "Random Forests models' performance", x = "Number of randomly selected variables") +
-  geom_text(aes(label=round(RF_model[["results"]][["Accuracy"]],3)), hjust = 1.3) +
+  geom_text(aes(label=round(RF_model[["results"]][["Accuracy"]],4)), hjust = 1.3) +
   theme(plot.title = element_text(size = 38, hjust = 0.5))
 RF_plot
 
