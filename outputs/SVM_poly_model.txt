@@ -1,0 +1,12 @@
+Support Vector Machine object of class "ksvm" 
+
+SV type: C-svc  (classification) 
+ parameter : cost C = 1 
+
+Polynomial kernel function. 
+ Hyperparameters : degree =  1  scale =  1  offset =  1 
+
+Number of Support Vectors : 151 
+
+Objective Function Value : -121.8171 
+Training error : 0.186207 
