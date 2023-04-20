@@ -3,6 +3,22 @@ source("data_preparation.R")
 source("Pred_models.R")
 
 
+# Normalization ========
+pdf(file = "plots/boxplot_variables_1.pdf", width = 15, height = 8)
+barplot
+dev.off()
+
+pdf(file = "plots/boxplot_variables_2.pdf", width = 15, height = 8)
+norm_barplot
+dev.off()
+
+
+# Train Test split ==========
+pdf(file = "plots/prop_table_sets.pdf")
+prop_table
+dev.off()
+
+
 # k-NN model ==========
 # Save model
 kNN_model.txt <- file("outputs/kNN_model.txt")

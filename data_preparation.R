@@ -42,13 +42,12 @@ data_df <- variables_0.8[,apply(variances, 2,
 cat("Variable No. after eliminating variance = 0: ", ncol(data_df),
     "\nEliminated variables: ", removed_var)
 
+
 # First description of the variables ==============
-#pdf(file = "plots/boxplot_variables_1.pdf", width = 15, height = 8)
-ggplot(melt(data_df), aes(x = variable, y = value)) +
+barplot <- ggplot(melt(data_df), aes(x = variable, y = value)) +
   labs(title = "Descriptors values distribution boxplot", x = "Descriptors") + 
   geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust=1),
                          plot.title = element_text(size = 22, hjust = 0.5))
-#dev.off()
 
 
 # Normalization =========
@@ -62,12 +61,10 @@ normalize(c(10, 20, 30, 40, 50))
 norm_data <- as.data.frame(lapply(data_df, normalize))
 
 # boxplot normalized data
-#pdf(file = "plots/boxplot_variables_2.pdf", width = 15, height = 8)
-ggplot(melt(norm_data), aes(x = variable, y = value)) +
+norm_barplot <- ggplot(melt(norm_data), aes(x = variable, y = value)) +
   labs(title = "Normalized descriptors values distribution boxplot", x = "Descriptors") + 
   geom_boxplot() + theme(axis.text.x = element_text(angle = 45, hjust=1),
                          plot.title = element_text(size = 22, hjust = 0.5))
-#dev.off()
 
 # print out into the same pdf
 '
@@ -100,14 +97,15 @@ for (i in 1:nrow(data)) {
     }
 }
 norm_data <- cbind(label, norm_data)
+norm_data <- cbind(data$Molecule.ChEMBL.ID, norm_data)
 norm_data$label <- as.factor(norm_data$label)
 table(norm_data$label)
 prop.table(table(norm_data$label))
 
 
 # Train Test Split ========
-set.seed(12345)
 norm_data$id <- 1:nrow(norm_data)  # create temporary variable to facilitate sampling
+set.seed(12345)
 train <- norm_data %>% dplyr::sample_frac(0.7)  # Split train set
 test  <- dplyr::anti_join(norm_data, train, by = "id")  # Split test set
 
@@ -127,12 +125,11 @@ all_sets <- lapply(all_sets, function(dat) {  # Add "type" and "label" column
   dat
 })
 all_sets <- do.call(rbind, all_sets)  # Include all tables to the same data frame
-#pdf(file = "plots/prop_table_sets.pdf")
-ggplot(all_sets,aes(x=Label, y=Freq, fill = Label)) +
+
+prop_table <- ggplot(all_sets,aes(x=Label, y=Freq, fill = Label)) +
   geom_col() + 
   facet_wrap(~ type, scales = "free_x")
-#dev.off()
-
+prop_table
 
 # Remove temporary variable
 norm_data <- subset(norm_data, select = -c(id))
