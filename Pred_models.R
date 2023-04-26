@@ -5,6 +5,7 @@ source("data_preparation.R")
 library(caret)
 library(naivebayes)
 library(kernlab)
+library(ROCR)
 
 
 # Control =============
@@ -79,6 +80,7 @@ values_NB_mod
 
 # Support Vector Machine ===========
 # SVM linear classifier
+set.seed(12345)
 svm_lin_model <- ksvm(label ~ ., data = norm_data[-1], kernel = "vanilladot")
 svm_lin_pred <- predict(svm_lin_model, test[-(1:2)])
 table(svm_lin_pred == test[[2]])
@@ -86,13 +88,15 @@ values_lin_mod <- confusionMatrix(svm_lin_pred, test[[2]],
                 positive = "1")
 
 # SVM with Radial Basis Function Kernel
-svm_rbf_model <- ksvm(label ~ ., data = norm_data[-1], kernel = "rbfdot")
+set.seed(12345)
+svm_rbf_model <- ksvm(label ~ ., data = norm_data[-1], kernel = "rbfdot", prob.model = T)
 svm_rbf_pred <- predict(svm_rbf_model, test[-(1:2)])
 table(svm_rbf_pred == test[[2]])
 values_rbf_mod <- confusionMatrix(svm_rbf_pred, test[[2]], 
                 positive = "1")
 
 # SVM with Polynomial Kernel
+set.seed(12345)
 svm_poly_model <- ksvm(label ~ ., data = norm_data[-1], kernel = "polydot")
 svm_poly_pred <- predict(svm_poly_model, test[-(1:2)])
 table(svm_poly_pred == test[[2]])
@@ -134,5 +138,68 @@ table(RandomForest_pred == test[[2]])
 values_RF_mod <- confusionMatrix(RandomForest_pred, test[[2]], 
                                  positive = "1")
 values_RF_mod
+
+
+# Predicted probabilities ============
+# kNN model
+kNN_prob <- predict(kNN_model, test[-(1:2)], type = "prob")
+kNN_predict <- prediction(predictions = kNN_prob[2],
+                          labels = test[[2]])
+kNN_perform <- performance(kNN_predict, measure = "tpr", x.measure = "fpr")
+kNN_auc <- performance(kNN_predict, measure = "auc")
+
+# Naive Bayes model
+NB_prob <- predict(NB_model, test[-(1:2)], type = "prob")
+NB_predict <- prediction(predictions = NB_prob[2],
+                          labels = test[[2]])
+NB_perform <- performance(NB_predict, measure = "tpr", x.measure = "fpr")
+NB_auc <- performance(NB_predict, measure = "auc")
+
+# SVM model
+SVM_prob <- as.data.frame(predict(svm_rbf_model, test[-(1:2)], type = "prob"))
+SVM_predict <- prediction(predictions = SVM_prob[2],
+                          labels = test[[2]])
+SVM_perform <- performance(SVM_predict, measure = "tpr", x.measure = "fpr")
+SVM_auc <- performance(SVM_predict, measure = "auc")
+
+# RF model
+RF_prob <- predict(RF_model, test[-(1:2)], type = "prob")
+RF_predict <- prediction(predictions = RF_prob[2],
+                          labels = test[[2]])
+RF_perform <- performance(RF_predict, measure = "tpr", x.measure = "fpr")
+RF_auc <- performance(RF_predict, measure = "auc")
+
+
+# kNN model ROC curve
+plot(kNN_perform, main = "ROC cruve for kNN model performance")
+mtext("A", side = 3, adj = -0.13, cex = 1.5, padj = -2.5)
+mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
+mtext(round(kNN_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
+
+# NB model ROC curve
+plot(NB_perform, main = "ROC cruve for Naive Bayes model performance")
+mtext("B", side = 3, adj = -0.13, cex = 1.5, padj = -2.5)
+mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
+mtext(round(NB_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
+
+# SVM model ROC curve
+plot(SVM_perform, main = "ROC cruve for SVM model performance")
+mtext("C", side = 3, adj = -0.13, cex = 1.5, padj = -2.5)
+mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
+mtext(round(SVM_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
+
+# RF model ROC curve
+plot(RF_perform, main = "ROC cruve for Random Forest model performance")
+mtext("D", side = 3, adj = -0.13, cex = 1.5, padj = -2.5)
+mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
+mtext(round(RF_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
+
+
+
+
+
+
+
+
 
 
