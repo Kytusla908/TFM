@@ -129,3 +129,35 @@ sink(RF_matrix.txt, append = TRUE, type = "output")
 values_RF_mod
 closeAllConnections()
 
+
+# ROC cruves ==========
+
+pdf(file = "plots/ROC_curves.pdf", width = 13, height = 13)
+
+par(mfrow = c(2,2))
+
+# kNN model ROC curve
+plot(kNN_perform, main = "ROC cruve for kNN model performance")
+mtext("A", side = 3, adj = -0.1, cex = 1.5, padj = -1.5)
+mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
+mtext(round(kNN_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
+
+# NB model ROC curve
+plot(NB_perform, main = "ROC cruve for Naive Bayes model performance")
+mtext("B", side = 3, adj = -0.1, cex = 1.5, padj = -1.5)
+mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
+mtext(round(NB_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
+
+# SVM model ROC curve
+plot(SVM_perform, main = "ROC cruve for SVM model performance")
+mtext("C", side = 3, adj = -0.1, cex = 1.5, padj = -1.5)
+mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
+mtext(round(SVM_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
+
+# RF model ROC curve
+plot(RF_perform, main = "ROC cruve for Random Forest model performance")
+mtext("D", side = 3, adj = -0.1, cex = 1.5, padj = -1.5)
+mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
+mtext(round(RF_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
+
+dev.off()
