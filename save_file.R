@@ -130,11 +130,47 @@ values_RF_mod
 closeAllConnections()
 
 
+# Boosted decision trees ==========
+# Save model
+boost_model.txt <- file("outputs/boost_model.txt")
+sink(boost_model.txt, append = TRUE, type = "output")
+boost_model
+closeAllConnections()
+
+#Save plot
+pdf(file = "plots/performance_plot_boost.pdf", width = 12, height = 12)
+boost_plot
+dev.off()
+
+# Save confusion matrix
+boost_matrix.txt <- file("outputs/boost_matrix.txt")
+sink(boost_matrix.txt, append = TRUE, type = "output")
+values_RF_mod
+closeAllConnections()
+
+
+# ANN ==========
+# Save model
+ann_model.txt <- file("outputs/ann_model.txt")
+sink(ann_model.txt, append = TRUE, type = "output")
+ann_model
+closeAllConnections()
+
+#Save plot
+pdf(file = "plots/performance_plot_ann.pdf", width = 12, height = 12)
+ann_plot
+dev.off()
+
+# Save confusion matrix
+ann_matrix.txt <- file("outputs/ann_matrix.txt")
+sink(ann_matrix.txt, append = TRUE, type = "output")
+values_ann_mod
+closeAllConnections()
+
+
 # ROC cruves ==========
-
-pdf(file = "plots/ROC_curves.pdf", width = 13, height = 13)
-
-par(mfrow = c(2,2))
+pdf(file = "plots/ROC_curves.pdf", width = 18, height = 13)
+par(mfrow = c(2,3))
 
 # kNN model ROC curve
 plot(kNN_perform, main = "ROC cruve for kNN model performance")
@@ -159,5 +195,17 @@ plot(RF_perform, main = "ROC cruve for Random Forest model performance")
 mtext("D", side = 3, adj = -0.1, cex = 1.5, padj = -1.5)
 mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
 mtext(round(RF_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
+
+# Boosted decision tree model ROC curve
+plot(boost_perform, main = "ROC cruve for Boosted decision trees model performance")
+mtext("E", side = 3, adj = -0.13, cex = 1.5, padj = -2.5)
+mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
+mtext(round(boost_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
+
+# Boosted decision tree model ROC curve
+plot(ann_perform, main = "ROC cruve for ANN model performance")
+mtext("F", side = 3, adj = -0.13, cex = 1.5, padj = -2.5)
+mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
+mtext(round(ann_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
 
 dev.off()
