@@ -1,10 +1,12 @@
 # Sources =============
 source("data_preparation.R")
+source("functions.R")
 
 # Libraries ============
 library(caret)
 library(naivebayes)
 library(kernlab)
+library(adabag)
 library(ROCR)
 
 
@@ -140,6 +142,55 @@ values_RF_mod <- confusionMatrix(RandomForest_pred, test[[2]],
 values_RF_mod
 
 
+# Boosting decision trees ====================
+grid <- expand.grid(mfinal = (1:4)*50,
+                    maxdepth = c(1:3),
+                    coeflearn = c("Breiman"))
+set.seed(12345)
+boost_model <- train(label ~ ., data = norm_data[-1], method = "AdaBoost.M1",
+                     tuneGrid = grid, trControl = ctrl)
+boost_model
+
+# Performance plot
+boost_plot <- ggplot(boost_model) +
+  labs(title = "Boosted decision tree models' performance",
+       x = "Number of randomly selected variables") +
+  geom_text(aes(label=round(boost_model[["results"]][["Accuracy"]],4)), hjust = 1.3) +
+  theme(plot.title = element_text(size = 38, hjust = 0.5))
+boost_plot
+
+# Predictions
+boost_pred <- predict(boost_model, test[-(1:2)])
+table(boost_pred == test[[2]])
+values_boost_mod <- confusionMatrix(boost_pred, test[[2]], 
+                                 positive = "1")
+values_boost_mod
+
+
+# ANN =============
+grid <- expand.grid(size = (1:10),
+                    decay = sequence(5))
+set.seed(12345)
+ann_model <- train(label ~ ., data = norm_data[-1], method = "nnet",
+                     tuneGrid = grid, trControl = ctrl)
+ann_model
+
+# Performance plot
+ann_plot <- ggplot(ann_model) +
+  labs(title = "ANN models' performance",
+       x = "Number of randomly selected variables") +
+  geom_text(aes(label=round(ann_model[["results"]][["Accuracy"]],4)), hjust = 1.3) +
+  theme(plot.title = element_text(size = 38, hjust = 0.5))
+ann_plot
+
+# Predictions
+ann_pred <- predict(ann_model, test[-(1:2)])
+table(ann_pred == test[[2]])
+values_ann_mod <- confusionMatrix(ann_pred, test[[2]], 
+                                    positive = "1")
+values_ann_mod
+
+
 # Predicted probabilities ============
 # kNN model
 kNN_prob <- predict(kNN_model, test[-(1:2)], type = "prob")
@@ -169,7 +220,22 @@ RF_predict <- prediction(predictions = RF_prob[2],
 RF_perform <- performance(RF_predict, measure = "tpr", x.measure = "fpr")
 RF_auc <- performance(RF_predict, measure = "auc")
 
+# Boosted decision tree model
+boost_prob <- predict(boost_model, test[-(1:2)], type = "prob")
+boost_predict <- prediction(predictions = boost_prob[2],
+                         labels = test[[2]])
+boost_perform <- performance(boost_predict, measure = "tpr", x.measure = "fpr")
+boost_auc <- performance(boost_predict, measure = "auc")
 
+# ANN model
+ann_prob <- predict(ann_model, test[-(1:2)], type = "prob")
+ann_predict <- prediction(predictions = ann_prob[2],
+                            labels = test[[2]])
+ann_perform <- performance(ann_predict, measure = "tpr", x.measure = "fpr")
+ann_auc <- performance(ann_predict, measure = "auc")
+
+
+# ROC curves ==================
 # kNN model ROC curve
 plot(kNN_perform, main = "ROC cruve for kNN model performance")
 mtext("A", side = 3, adj = -0.13, cex = 1.5, padj = -2.5)
@@ -194,6 +260,11 @@ mtext("D", side = 3, adj = -0.13, cex = 1.5, padj = -2.5)
 mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
 mtext(round(RF_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
 
+# Boosted decision trees model ROC curve
+plot(boost_perform, main = "ROC cruve for Boosted decision trees model performance")
+mtext("E", side = 3, adj = -0.13, cex = 1.5, padj = -2.5)
+mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
+mtext(round(boost_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
 
 
 

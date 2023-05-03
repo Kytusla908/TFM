@@ -51,10 +51,6 @@ barplot <- ggplot(melt(data_df), aes(x = variable, y = value)) +
 
 
 # Normalization =========
-normalize <- function(x) {
-  return ((x - min(x)) / (max(x) - min(x)))
-}
-
 # test normalization function - the results should be identical
 normalize(c(1, 2, 3, 4, 5))
 normalize(c(10, 20, 30, 40, 50))
