@@ -174,37 +174,37 @@ par(mfrow = c(2,3))
 
 # kNN model ROC curve
 plot(kNN_perform, main = "ROC curve for kNN model")
-mtext("A", side = 3, adj = -0.13, cex = 1.5, padj = -2.5)
+mtext("A", side = 3, adj = -0.05, cex = 1.5, padj = -1.2)
 mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
 mtext(round(kNN_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
 
 # NB model ROC curve
 plot(NB_perform, main = "ROC curve for Naive Bayes model")
-mtext("B", side = 3, adj = -0.13, cex = 1.5, padj = -2.5)
+mtext("B", side = 3, adj = -0.05, cex = 1.5, padj = -1.2)
 mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
 mtext(round(NB_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
 
 # SVM model ROC curve
 plot(SVM_perform, main = "ROC curve for SVM model")
-mtext("C", side = 3, adj = -0.13, cex = 1.5, padj = -2.5)
+mtext("C", side = 3, adj = -0.05, cex = 1.5, padj = -1.2)
 mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
 mtext(round(SVM_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
 
 # RF model ROC curve
 plot(RF_perform, main = "ROC curve for Random Forest model")
-mtext("D", side = 3, adj = -0.13, cex = 1.5, padj = -2.5)
+mtext("D", side = 3, adj = -0.05, cex = 1.5, padj = -1.2)
 mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
 mtext(round(RF_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
 
 # Boosted decision trees model ROC curve
 plot(boost_perform, main = "ROC curve for Boosted decision trees model")
-mtext("E", side = 3, adj = -0.13, cex = 1.5, padj = -2.5)
+mtext("E", side = 3, adj = -0.05, cex = 1.5, padj = -1.2)
 mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
 mtext(round(boost_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
 
 # ANN model ROC curve
 plot(ann_perform, main = "ROC curve for ANN model")
-mtext("F", side = 3, adj = -0.13, cex = 1.5, padj = -2.5)
+mtext("F", side = 3, adj = -0.05, cex = 1.5, padj = -1.2)
 mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
 mtext(round(ann_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
 
