@@ -1,33 +1,33 @@
 Naive Bayes 
 
-290 samples
+203 samples
  61 predictor
   2 classes: '0', '1' 
 
 No pre-processing
 Resampling: Cross-Validated (10 fold, repeated 5 times) 
-Summary of sample sizes: 261, 261, 261, 261, 261, 261, ... 
+Summary of sample sizes: 182, 182, 183, 183, 182, 182, ... 
 Resampling results across tuning parameters:
 
-  adjust     Accuracy   Kappa    
-  0.0000000        NaN        NaN
-  0.1071429  0.7289294  0.4566628
-  0.2142857  0.7330476  0.4646392
-  0.3214286  0.7248374  0.4477303
-  0.4285714  0.7207192  0.4401414
-  0.5357143  0.7248588  0.4487094
-  0.6428571  0.7227635  0.4447436
-  0.7500000  0.7261872  0.4517591
-  0.8571429  0.7316814  0.4627678
-  0.9642857  0.7288752  0.4570966
-  1.0714286  0.7309212  0.4611170
-  1.1785714  0.7316108  0.4623439
-  1.2857143  0.7303021  0.4593306
-  1.3928571  0.7261872  0.4510806
-  1.5000000  0.7296601  0.4582238
+  laplace    Accuracy   Kappa    
+  0.0000000  0.7344486  0.4586184
+  0.1071429  0.7344486  0.4586184
+  0.2142857  0.7344486  0.4586184
+  0.3214286  0.7344486  0.4586184
+  0.4285714  0.7344486  0.4586184
+  0.5357143  0.7344486  0.4586184
+  0.6428571  0.7344486  0.4586184
+  0.7500000  0.7344486  0.4586184
+  0.8571429  0.7344486  0.4586184
+  0.9642857  0.7344486  0.4586184
+  1.0714286  0.7344486  0.4586184
+  1.1785714  0.7344486  0.4586184
+  1.2857143  0.7344486  0.4586184
+  1.3928571  0.7344486  0.4586184
+  1.5000000  0.7344486  0.4586184
 
-Tuning parameter 'laplace' was held constant at a value of 0
-Tuning parameter 'usekernel' was held constant
- at a value of TRUE
+Tuning parameter 'usekernel' was held constant at a value of FALSE
+Tuning parameter 'adjust' was held
+ constant at a value of 0
 Accuracy was used to select the optimal model using the largest value.
-The final values used for the model were laplace = 0, usekernel = TRUE and adjust = 0.2142857.
+The final values used for the model were laplace = 0, usekernel = FALSE and adjust = 0.

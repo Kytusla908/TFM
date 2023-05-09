@@ -5,7 +5,7 @@ SV type: C-svc  (classification)
 
 Linear (vanilla) kernel function. 
 
-Number of Support Vectors : 151 
+Number of Support Vectors : 127 
 
-Objective Function Value : -121.8171 
-Training error : 0.186207 
+Objective Function Value : -101.7123 
+Training error : 0.216749 

@@ -4,9 +4,10 @@ SV type: C-svc  (classification)
  parameter : cost C = 1 
 
 Gaussian Radial Basis kernel function. 
- Hyperparameter : sigma =  0.0180638396372481 
+ Hyperparameter : sigma =  0.428972545271474 
 
-Number of Support Vectors : 218 
+Number of Support Vectors : 151 
 
-Objective Function Value : -133.59 
-Training error : 0.162069 
+Objective Function Value : -94.4621 
+Training error : 0.152709 
+Probability model included. 

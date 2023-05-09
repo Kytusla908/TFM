@@ -19,7 +19,7 @@ ctrl <- trainControl(method = "repeatedcv",
 # Automated paramenter tuning
 grid <- expand.grid(k = c(1,3,5,7,15,21,27,35))
 set.seed(12345)
-kNN_model <- train(label ~ ., data = norm_data[-1], method = "knn",
+kNN_model <- train(label ~ ., data = train[-1], method = "knn",
                    tuneGrid = grid, trControl = ctrl)
 kNN_model
 
@@ -45,7 +45,7 @@ grid <- expand.grid(usekernel = c(FALSE,TRUE),
                     laplace = seq(0,1.5, length = 5),
                     adjust = seq(0,1.5, length = 5))
 set.seed(12345)
-NB_model1 <- train(label ~ ., data = norm_data[-1], method = "naive_bayes",
+NB_model1 <- train(label ~ ., data = train[-1], method = "naive_bayes",
                   tuneGrid = grid, trControl = ctrl)
 NB_model1
 
@@ -55,19 +55,18 @@ NB1_plot <- ggplot(NB_model1) +
 NB1_plot
 
 # useKernel = TRUE models
-grid <- expand.grid(usekernel = c(TRUE),
-                    laplace = 0,
-                    adjust = seq(0,1.5, length = 15))
+grid <- expand.grid(usekernel = c(FALSE),
+                    laplace = seq(0,1.5, length = 15),
+                    adjust = 0)
 set.seed(12345)
-NB_model <- train(label ~ ., data = norm_data[-1], method = "naive_bayes",
+NB_model <- train(label ~ ., data = train[-1], method = "naive_bayes",
                   tuneGrid = grid, trControl = ctrl)
 NB_model
 
 # Performance plot
 NB_plot <- ggplot(NB_model) +
   labs(title = "Naive Bayes models' performance", subtitle = "Kernel = TRUE & Laplace = 0") +
-  geom_text(aes(label=round(NB_model[["results"]][["adjust"]],3)), hjust = 1.2) +
-  geom_text(aes(label=round(NB_model[["results"]][["Accuracy"]],3)), hjust = -0.3) +
+  geom_text(aes(label=round(NB_model[["results"]][["Accuracy"]],3)), vjust = 1.5) +
   theme(plot.title = element_text(size = 22, hjust = 0.5),
         plot.subtitle = element_text(size = 15, hjust = 0.5))
 NB_plot
@@ -83,7 +82,7 @@ values_NB_mod
 # Support Vector Machine ===========
 # SVM linear classifier
 set.seed(12345)
-svm_lin_model <- ksvm(label ~ ., data = norm_data[-1], kernel = "vanilladot")
+svm_lin_model <- ksvm(label ~ ., data = train[-1], kernel = "vanilladot")
 svm_lin_pred <- predict(svm_lin_model, test[-(1:2)])
 table(svm_lin_pred == test[[2]])
 values_lin_mod <- confusionMatrix(svm_lin_pred, test[[2]], 
@@ -91,7 +90,7 @@ values_lin_mod <- confusionMatrix(svm_lin_pred, test[[2]],
 
 # SVM with Radial Basis Function Kernel
 set.seed(12345)
-svm_rbf_model <- ksvm(label ~ ., data = norm_data[-1], kernel = "rbfdot", prob.model = T)
+svm_rbf_model <- ksvm(label ~ ., data = train[-1], kernel = "rbfdot", prob.model = T)
 svm_rbf_pred <- predict(svm_rbf_model, test[-(1:2)])
 table(svm_rbf_pred == test[[2]])
 values_rbf_mod <- confusionMatrix(svm_rbf_pred, test[[2]], 
@@ -99,7 +98,7 @@ values_rbf_mod <- confusionMatrix(svm_rbf_pred, test[[2]],
 
 # SVM with Polynomial Kernel
 set.seed(12345)
-svm_poly_model <- ksvm(label ~ ., data = norm_data[-1], kernel = "polydot")
+svm_poly_model <- ksvm(label ~ ., data = train[-1], kernel = "polydot")
 svm_poly_pred <- predict(svm_poly_model, test[-(1:2)])
 table(svm_poly_pred == test[[2]])
 values_poly_mod <- confusionMatrix(svm_poly_pred, test[[2]], 
@@ -110,20 +109,21 @@ SVM <- data.frame(model = c("Linear model","RBF model", "Polinomial model"),
                   accuracy = c(values_lin_mod[["overall"]][["Accuracy"]],
                                values_rbf_mod[["overall"]][["Accuracy"]],
                                values_poly_mod[["overall"]][["Accuracy"]]))
-SVM %>% arrange(accuracy)
+SVM %>% arrange(desc(accuracy))
 
 # Performance plot
 SVM_plot <- ggplot(SVM, aes(x = model, y = accuracy, fill = model)) + geom_col() +
+  geom_text(aes(label=round(SVM$accuracy,3)), vjust = -0.5) +
   labs(title = "Support Vector Machine models' performance") + 
   theme(plot.title = element_text(size = 22, hjust = 0.2))
 SVM_plot
 
 
 # Random forest ==========
-p <- round(sqrt(ncol(norm_data)))
-grid <- expand.grid(mtry = seq(p,p+2*p))
+p <- round(sqrt(ncol(train)))
+grid <- expand.grid(mtry = seq(p,p+3*p))
 set.seed(12345)
-RF_model <- train(label ~ ., data = norm_data[-1], method = "rf",
+RF_model <- train(label ~ ., data = train[-1], method = "rf",
                   tuneGrid = grid, trControl = ctrl)
 RF_model
 
@@ -147,7 +147,7 @@ grid <- expand.grid(mfinal = (1:4)*50,
                     maxdepth = c(1:3),
                     coeflearn = c("Breiman"))
 set.seed(12345)
-boost_model <- train(label ~ ., data = norm_data[-1], method = "AdaBoost.M1",
+boost_model <- train(label ~ ., data = train[-1], method = "AdaBoost.M1",
                      tuneGrid = grid, trControl = ctrl)
 boost_model
 
@@ -171,7 +171,7 @@ values_boost_mod
 grid <- expand.grid(size = (1:16),
                     decay = sequence(5))
 set.seed(12345)
-ann_model <- train(label ~ ., data = norm_data[-1], method = "nnet",
+ann_model <- train(label ~ ., data = train[-1], method = "nnet",
                      tuneGrid = grid, trControl = ctrl)
 ann_model
 
@@ -232,6 +232,18 @@ ann_predict <- prediction(predictions = ann_prob[2],
                             labels = test[[2]])
 ann_perform <- performance(ann_predict, measure = "tpr", x.measure = "fpr")
 ann_auc <- performance(ann_predict, measure = "auc")
+
+
+# AUC ==================
+AUC <- data.frame(model = c("kNN model","NB model", "SVM model",
+                            "RF model","Boost model", "ANN model"),
+                  AUC = c(round(kNN_auc@y.values[[1]],5),round(NB_auc@y.values[[1]],5),
+                          round(SVM_auc@y.values[[1]],5),round(RF_auc@y.values[[1]],5),
+                          round(boost_auc@y.values[[1]],5),round(ann_auc@y.values[[1]],5)))
+AUC %>% arrange(desc(AUC))
+
+
+
 
 
 # ROC curves ==================
