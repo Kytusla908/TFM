@@ -3,11 +3,13 @@ source("data_preparation.R")
 source("functions.R")
 
 # Libraries ============
+library(dplyr)
 library(caret)
 library(naivebayes)
 library(kernlab)
 library(adabag)
 library(ROCR)
+library(randomForest)
 
 
 # Control =============
@@ -243,9 +245,6 @@ AUC <- data.frame(model = c("kNN model","NB model", "SVM model",
 AUC %>% arrange(desc(AUC))
 
 
-
-
-
 # ROC curves ==================
 # kNN model ROC curve
 plot(kNN_perform, main = "ROC curve for kNN model")
@@ -284,9 +283,86 @@ mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
 mtext(round(ann_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
 
 
+# Evaluating original RF model ================
+# ROC curve
+{plot(RF_perform, main = "ROC curve for Random Forest model")
+mtext("D", side = 3, adj = -0.13, cex = 1.5, padj = -2.5)
+mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
+mtext(round(RF_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)}
+
+# Best cutoff point to reduce FN
+cost.perf = performance(RF_predict, measure = "cost") 
+RF_predict@cutoffs[[1]][which.min(cost.perf@y.values[[1]])]
 
 
+# Improving RF model ===============
+param_grid <- expand.grid(
+  # Number of randomly selected variables
+  mtry = seq(round(sqrt(ncol(train))),round(sqrt(ncol(train))) * 4),
+  # Number of trees to be grown
+  ntree = c(100, 300, 500, 1000, 1500),
+  # Cutoff values
+  cutoff1 = c(0.5, 0.6, 0.7, 0.8),
+  # Sample without replacement
+  replace = c(FALSE),
+  # RMSE column (will be used later)
+  OOB_estimate = NA,
+  # AUC value
+  AUC = NA
+)
 
+#Setting second cutoff value (required by the randomForest function)
+cutoff2 <- c()
+for (i in seq_len(nrow(param_grid))) {
+  if (param_grid$cutoff1[i] == 0.5){
+    cutoff2 = append(cutoff2, 0.5)
+  }
+  if (param_grid$cutoff1[i] == 0.6){
+  cutoff2 = append(cutoff2, 0.4)
+  }
+  if (param_grid$cutoff1[i] == 0.7){
+  cutoff2 = append(cutoff2, 0.3)
+  }
+  if (param_grid$cutoff1[i] == 0.8){
+  cutoff2 = append(cutoff2, 0.2)
+  }
+}
 
+# Join alltogether
+param_grid <- cbind(param_grid, cutoff2)
 
+#Reorder columns
+order <- c("mtry","ntree","cutoff1","cutoff2","replace","OOB_estimate","AUC")
+param_grid <- param_grid[,order]
+
+# Run the models
+for (i in seq_len(nrow(param_grid))) {
+  # Set seed for each iteration
+  set.seed(12345)
+  # RF model building
+  model <- randomForest(
+    formula = label ~ .,
+    data = train[-1],
+    mtry = param_grid$mtry[i],
+    ntree = param_grid$ntree[i],
+    replace = param_grid$replace[i],
+    cutoff = c(param_grid$cutoff1[i], param_grid$cutoff2[i])
+  )
+  
+  # Get OBB estimate
+  param_grid$OOB_estimate[i] <- model[["err.rate"]][nrow(model[["err.rate"]]),1]
+
+  # Calculate predictions
+  model_prob <- as.data.frame(predict(model, test[-(1:2)], type = "prob"))
+  model_predict <- prediction(predictions = model_prob[2],
+                           labels = test[[2]])
+  model_perform <- performance(model_predict, measure = "tpr", x.measure = "fpr")
+  model_auc <- performance(model_predict, measure = "auc")
+  
+  # Store AUC value
+  param_grid$AUC[i] <- round(model_auc@y.values[[1]],5)
+  
+}
+
+param_grid %>% arrange(desc(AUC)) %>% head(10)
 
