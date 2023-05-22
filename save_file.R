@@ -209,3 +209,11 @@ mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
 mtext(round(ann_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
 
 dev.off()
+
+
+# Def RF model
+improved_RF_models.txt <- file("outputs/improved_RF_models.txt")
+sink(ann_model.txt, append = TRUE, type = "output")
+param_grid %>% arrange(desc(AUC)) %>% head(10)
+closeAllConnections()
+
