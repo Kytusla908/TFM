@@ -300,39 +300,31 @@ param_grid <- expand.grid(
   # Number of randomly selected variables
   mtry = seq(round(sqrt(ncol(train))),round(sqrt(ncol(train))) * 4),
   # Number of trees to be grown
-  ntree = c(100, 300, 500, 1000, 1500),
+  ntree = c(300, 500, 1000, 1500, 2000, 3000),
   # Cutoff values
-  cutoff1 = c(0.5, 0.6, 0.7, 0.8),
-  # Sample without replacement
-  replace = c(FALSE),
-  # RMSE column (will be used later)
+  cutoff1 = c(0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85),
+  # Sample with or without replacement
+  replace = c(TRUE, FALSE),
+  # Accuracy column
+  ACC = NA,
+  # RMSE column
   OOB_estimate = NA,
   # AUC value
   AUC = NA
 )
 
 #Setting second cutoff value (required by the randomForest function)
-cutoff2 <- c()
+cutoff0 <- c()
 for (i in seq_len(nrow(param_grid))) {
-  if (param_grid$cutoff1[i] == 0.5){
-    cutoff2 = append(cutoff2, 0.5)
-  }
-  if (param_grid$cutoff1[i] == 0.6){
-  cutoff2 = append(cutoff2, 0.4)
-  }
-  if (param_grid$cutoff1[i] == 0.7){
-  cutoff2 = append(cutoff2, 0.3)
-  }
-  if (param_grid$cutoff1[i] == 0.8){
-  cutoff2 = append(cutoff2, 0.2)
-  }
+  diff <- 1 - param_grid$cutoff1[i]
+    cutoff0 = append(cutoff0, diff)
 }
 
 # Join alltogether
-param_grid <- cbind(param_grid, cutoff2)
+param_grid <- cbind(param_grid, cutoff0)
 
 #Reorder columns
-order <- c("mtry","ntree","cutoff1","cutoff2","replace","OOB_estimate","AUC")
+order <- c("mtry","ntree","cutoff0","cutoff1","replace","ACC" ,"OOB_estimate","AUC")
 param_grid <- param_grid[,order]
 
 # Run the models
@@ -346,8 +338,14 @@ for (i in seq_len(nrow(param_grid))) {
     mtry = param_grid$mtry[i],
     ntree = param_grid$ntree[i],
     replace = param_grid$replace[i],
-    cutoff = c(param_grid$cutoff1[i], param_grid$cutoff2[i])
+    cutoff = c(param_grid$cutoff0[i], param_grid$cutoff1[i])
   )
+  
+  # Predictions
+  model_pred <- predict(model, test[-(1:2)])
+  values_model <- confusionMatrix(model_pred, test[[2]], 
+                                   positive = "1")
+  param_grid$ACC[i] <- values_model[["overall"]][["Accuracy"]]
   
   # Get OBB estimate
   param_grid$OOB_estimate[i] <- model[["err.rate"]][nrow(model[["err.rate"]]),1]
@@ -365,4 +363,47 @@ for (i in seq_len(nrow(param_grid))) {
 }
 
 param_grid %>% arrange(desc(AUC)) %>% head(10)
+
+
+# Best Model ==================
+set.seed(12345)
+best.model <- randomForest(label ~.,
+                           data = train[-1],
+                           mtry = 30,
+                           ntree = 300,
+                           cutoff = c(0.4, 0.6),
+                           replace = TRUE)
+
+# Performance plot
+layout(matrix(c(1,2),nrow=1),
+       width=c(4,1))
+par(mar=c(5,4,4,0)) #No margin on the right side
+plot(best.model, main = "OBB error rates for the best tunned RF model")
+par(mar=c(5,0,4,2)) #No margin on the left side
+plot(c(0,1),type="n", axes=F, xlab="", ylab="")
+legend("center", colnames(model$err.rate),col=1:4,cex=0.8,fill=1:4)
+
+
+# Predictions
+best.model_pred <- predict(best.model, test[-(1:2)])
+table(best.model_pred == test[[2]])
+values_best.model_mod <- confusionMatrix(best.model_pred, test[[2]], 
+                                 positive = "1")
+values_best.model_mod
+
+# ROC curve and AUC
+best.model_prob <- as.data.frame(predict(best.model, test[-(1:2)], type = "prob"))
+best.model_predict <- prediction(predictions = best.model_prob[2],
+                         labels = test[[2]])
+best.model_perform <- performance(best.model_predict, measure = "tpr", x.measure = "fpr")
+best.model_auc <- performance(best.model_predict, measure = "auc")
+
+plot(best.model_perform, main = "ROC curve for the best Random Forest model found")
+subtitle <- "mtry = 30, ntree = 300, cutoff = c(0.4,0.6), replace = T"
+mtext(subtitle, side=3, line=0.3, at=-0.07, adj=-0.4, cex=1)
+mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
+mtext(round(best.model_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
+
+
+
 

@@ -211,9 +211,37 @@ mtext(round(ann_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
 dev.off()
 
 
-# Def RF model
+# Best model ===============
+# Top 10 tunned models
 improved_RF_models.txt <- file("outputs/improved_RF_models.txt")
 sink(ann_model.txt, append = TRUE, type = "output")
 param_grid %>% arrange(desc(AUC)) %>% head(10)
 closeAllConnections()
+
+# OOB error rates of the best model
+pdf(file = "plots/OOB_error_rates_best_model.pdf")
+layout(matrix(c(1,2),nrow=1),
+       width=c(4,1))
+par(mar=c(5,4,4,0)) #No margin on the right side
+plot(best.model, main = "OBB error rates for the best tunned RF model")
+par(mar=c(5,0,4,2)) #No margin on the left side
+plot(c(0,1),type="n", axes=F, xlab="", ylab="")
+legend("center", colnames(model$err.rate),col=1:4,cex=0.8,fill=1:4)
+dev.off()
+
+# Confusion matrix
+best_mod_matrix.txt <- file("outputs/best_mod_matrix.txt")
+sink(best_mod_matrix.txt, append = TRUE, type = "output")
+values_best.model_mod
+closeAllConnections()
+
+# ROC curve
+pdf(file = "plots/ROC_best_model.pdf")
+plot(best.model_perform, main = "ROC curve for the best Random Forest model found")
+subtitle <- "mtry = 30, ntree = 300, cutoff = c(0.4,0.6), replace = T"
+mtext(subtitle, side=3, line=0.3, at=-0.07, adj=-0.25, cex=1)
+mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
+mtext(round(best.model_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
+dev.off()
+
 
