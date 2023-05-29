@@ -212,9 +212,15 @@ dev.off()
 
 
 # Best model ===============
+# Tested hiperparameters
+RF_hiperparameters.txt <- file("outputs/RF_hiperparameters.txt")
+sink(RF_hiperparameters.txt, append = TRUE, type = "output")
+param_grid[-(6:8)]
+closeAllConnections()
+
 # Top 10 tunned models
 improved_RF_models.txt <- file("outputs/improved_RF_models.txt")
-sink(ann_model.txt, append = TRUE, type = "output")
+sink(improved_RF_models.txt, append = TRUE, type = "output")
 param_grid %>% arrange(desc(AUC)) %>% head(10)
 closeAllConnections()
 
