@@ -404,6 +404,13 @@ mtext(subtitle, side=3, line=0.3, at=-0.07, adj=-0.4, cex=1)
 mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
 mtext(round(best.model_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
 
+# Variable importance plot
+varImpPlot(best.model)
 
+# Plot biggest tree
+biggest_tree <- which(best.model$forest$ndbigtree == max(best.model$forest$ndbigtree))
+tree_func(best.model, biggest_tree)
 
-
+# Shortest tree
+shortest_tree <- which(best.model$forest$ndbigtree == min(best.model$forest$ndbigtree))
+tree_func(best.model, shortest_tree)

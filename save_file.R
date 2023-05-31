@@ -250,4 +250,18 @@ mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
 mtext(round(best.model_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
 dev.off()
 
+# Variable importance plot
+pdf(file = "plots/best_model_varImp.pdf")
+varImpPlot(best.model, 
+           main = "Variable Importance plot best.model")
+dev.off()
 
+# Plot biggest tree
+pdf(file = "plots/best_model_bigTree.pdf")
+tree_func(best.model, biggest_tree)
+dev.off()
+
+# Shortest tree
+pdf(file = "plots/best_model_shortTree.pdf")
+tree_func(best.model, shortest_tree)
+dev.off()
