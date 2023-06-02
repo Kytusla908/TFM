@@ -168,7 +168,7 @@ values_ann_mod
 closeAllConnections()
 
 
-# ROC cruves ==========
+# ROC curves ==========
 pdf(file = "plots/ROC_curves.pdf", width = 18, height = 13)
 par(mfrow = c(2,3))
 
@@ -244,8 +244,8 @@ closeAllConnections()
 # ROC curve
 pdf(file = "plots/ROC_best_model.pdf")
 plot(best.model_perform, main = "ROC curve for the best Random Forest model found")
-subtitle <- "mtry = 30, ntree = 300, cutoff = c(0.4,0.6), replace = T"
-mtext(subtitle, side=3, line=0.3, at=-0.07, adj=-0.25, cex=1)
+subtitle <- "mtry = 9, ntree = 300, cutoff = c(0.3,0.7), replace = F"
+mtext(subtitle, side=3, line=0.3, at=-0.07, adj=-0.4, cex=1)
 mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
 mtext(round(best.model_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
 dev.off()

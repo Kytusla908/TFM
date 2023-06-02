@@ -6,23 +6,23 @@ AdaBoost.M1
 
 No pre-processing
 Resampling: Cross-Validated (10 fold, repeated 5 times) 
-Summary of sample sizes: 182, 182, 183, 183, 182, 182, ... 
+Summary of sample sizes: 182, 183, 183, 184, 182, 182, ... 
 Resampling results across tuning parameters:
 
   maxdepth  mfinal  Accuracy   Kappa    
-  1          50     0.7051103  0.4036719
-  1         100     0.7118772  0.4169072
-  1         150     0.7099298  0.4120721
-  1         200     0.7079248  0.4081773
-  2          50     0.7283434  0.4500052
-  2         100     0.7492105  0.4909587
-  2         150     0.7452055  0.4833015
-  2         200     0.7420100  0.4774312
-  3          50     0.7392381  0.4733377
-  3         100     0.7471955  0.4885719
-  3         150     0.7431479  0.4799296
-  3         200     0.7449574  0.4843109
+  1          50     0.7013183  0.3965341
+  1         100     0.7052707  0.4032571
+  1         150     0.7044135  0.4013625
+  1         200     0.6995138  0.3904663
+  2          50     0.7261429  0.4468729
+  2         100     0.7201378  0.4344958
+  2         150     0.7270526  0.4478431
+  2         200     0.7264862  0.4471715
+  3          50     0.7321429  0.4569455
+  3         100     0.7309950  0.4550420
+  3         150     0.7361429  0.4657054
+  3         200     0.7359474  0.4661625
 
 Tuning parameter 'coeflearn' was held constant at a value of Breiman
 Accuracy was used to select the optimal model using the largest value.
-The final values used for the model were mfinal = 100, maxdepth = 2 and coeflearn = Breiman.
+The final values used for the model were mfinal = 150, maxdepth = 3 and coeflearn = Breiman.

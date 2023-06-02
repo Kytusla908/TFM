@@ -1,8 +1,10 @@
+source("functions.R")
+
 # Libraries ============
 library(ggplot2)
 library(reshape2)
 library(dplyr)
-library(class)
+
 
 # Input archives reading
 data_chembl <- read.csv("data/data.csv",sep = ";",dec = ".")
@@ -86,10 +88,10 @@ label <- c()
 for (i in 1:nrow(data)) {
   #Std.value equal or bigger than 11000 will set as active
   if (data$Standard.Value[i] >= 11000){  
-    label[i] = 1  # label 1 = active
+    label[i] = 0  # label 0 = inactive
   }
   else {
-    label[i] = 0  # label 0 = inactive
+    label[i] = 1  # label 1 = active
     }
 }
 norm_data <- cbind(label, norm_data)

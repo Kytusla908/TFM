@@ -8,6 +8,7 @@ library(caret)
 library(naivebayes)
 library(kernlab)
 library(adabag)
+library(nnet)
 library(ROCR)
 library(randomForest)
 
@@ -123,7 +124,7 @@ SVM_plot
 
 # Random forest ==========
 p <- round(sqrt(ncol(train)))
-grid <- expand.grid(mtry = seq(p,p+3*p))
+grid <- expand.grid(mtry = seq(p,p+4*p))
 set.seed(12345)
 RF_model <- train(label ~ ., data = train[-1], method = "rf",
                   tuneGrid = grid, trControl = ctrl)
@@ -302,7 +303,7 @@ param_grid <- expand.grid(
   # Number of trees to be grown
   ntree = c(300, 500, 1000, 1500, 2000, 3000),
   # Cutoff values
-  cutoff1 = c(0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85),
+  cutoff1 = c(0.35,0.4,0.45,0.5, 0.55, 0.6, 0.65, 0.7),
   # Sample with or without replacement
   replace = c(TRUE, FALSE),
   # Accuracy column
@@ -369,10 +370,10 @@ param_grid %>% arrange(desc(AUC)) %>% head(10)
 set.seed(12345)
 best.model <- randomForest(label ~.,
                            data = train[-1],
-                           mtry = 30,
+                           mtry = 9,
                            ntree = 300,
-                           cutoff = c(0.4, 0.6),
-                           replace = TRUE)
+                           cutoff = c(0.3, 0.7),
+                           replace = FALSE)
 
 # Performance plot
 layout(matrix(c(1,2),nrow=1),
@@ -399,7 +400,7 @@ best.model_perform <- performance(best.model_predict, measure = "tpr", x.measure
 best.model_auc <- performance(best.model_predict, measure = "auc")
 
 plot(best.model_perform, main = "ROC curve for the best Random Forest model found")
-subtitle <- "mtry = 30, ntree = 300, cutoff = c(0.4,0.6), replace = T"
+subtitle <- "mtry = 9, ntree = 300, cutoff = c(0.3,0.7), replace = F"
 mtext(subtitle, side=3, line=0.3, at=-0.07, adj=-0.4, cex=1)
 mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
 mtext(round(best.model_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
