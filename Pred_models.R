@@ -406,7 +406,8 @@ mtext("AUC = ", side = 1, adj = 0.8, padj = -3)
 mtext(round(best.model_auc@y.values[[1]],5), side = 1, adj = 0.92, padj = -3)
 
 # Variable importance plot
-varImpPlot(best.model)
+varImpPlot(best.model, n.var = 15,
+           main = "Variable Importance plot best.model")
 
 # Plot biggest tree
 biggest_tree <- which(best.model$forest$ndbigtree == max(best.model$forest$ndbigtree))

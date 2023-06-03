@@ -145,7 +145,7 @@ dev.off()
 # Save confusion matrix
 boost_matrix.txt <- file("outputs/boost_matrix.txt")
 sink(boost_matrix.txt, append = TRUE, type = "output")
-values_RF_mod
+values_boost_mod
 closeAllConnections()
 
 
@@ -252,16 +252,16 @@ dev.off()
 
 # Variable importance plot
 pdf(file = "plots/best_model_varImp.pdf")
-varImpPlot(best.model, 
+varImpPlot(best.model, n.var = 15,
            main = "Variable Importance plot best.model")
 dev.off()
 
 # Plot biggest tree
-pdf(file = "plots/best_model_bigTree.pdf")
+pdf(file = "plots/best_model_bigTree.pdf", width = 10, height = 10)
 tree_func(best.model, biggest_tree)
 dev.off()
 
 # Shortest tree
-pdf(file = "plots/best_model_shortTree.pdf")
+pdf(file = "plots/best_model_shortTree.pdf", width = 10, height = 10)
 tree_func(best.model, shortest_tree)
 dev.off()
