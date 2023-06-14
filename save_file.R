@@ -14,7 +14,7 @@ dev.off()
 
 
 # Train Test split ==========
-pdf(file = "plots/prop_table_sets.pdf")
+pdf(file = "plots/prop_table_sets.pdf", width = 8, height = 5 )
 prop_table
 dev.off()
 
@@ -50,13 +50,13 @@ pdf(file = "plots/performance_plot_NaiveBayes1.pdf")
 NB1_plot
 dev.off()
 
-# Save useKernel = TRUE models
+# Save useKernel = FALSE models
 NB_model.txt <- file("outputs/NB_model.txt")
 sink(NB_model.txt, append = TRUE, type = "output")
 NB_model
 closeAllConnections()
 
-#Save useKernel = TRUE plot
+#Save useKernel = FALSE plot
 pdf(file = "plots/performance_plot_NaiveBayes.pdf")
 NB_plot
 dev.off()
