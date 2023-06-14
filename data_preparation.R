@@ -13,6 +13,9 @@ variables <- data[ ,9:127]  # Df containing only the descriptors
 
 
 # DATA PREPARATION ============================
+#Missing values verification
+table(is.na(variables))
+
 # Correlation based Feature Selection ==========
 cor_matrix <- cor(variables)  # Calculate cor matrix
 cor_matrix[!lower.tri(cor_matrix)] <- 0  # Erase half of the mirror matrix
@@ -20,29 +23,19 @@ cor_matrix[!lower.tri(cor_matrix)] <- 0  # Erase half of the mirror matrix
 # Eliminating highly correlated variables
 variables_0.8 <- variables[, !apply(cor_matrix, 2,
                                     function(x) any(abs(x) > 0.8, na.rm = TRUE))]
-removed_var <- colnames(cor_matrix)[apply(cor_matrix, 2,
+corr_removed_var <- colnames(cor_matrix)[apply(cor_matrix, 2,
                                              function(x) any(abs(x) > 0.8, na.rm = TRUE))]
 cat("No of variables after setting 0.8 as cut-off: ", ncol(variables_0.8),
-    "\nEliminated variables:\n", removed_var)
-
-'
-variables_0.85 <- variables[, !apply(cor_matrix, 2,
-                                    function(x) any(abs(x) > 0.85, na.rm = TRUE))]
-variables_0.9 <- variables[, !apply(cor_matrix, 2,
-                                    function(x) any(abs(x) > 0.9, na.rm = TRUE))]
-cat("No of variables after setting 0.8 as cut-off: ", ncol(variables_0.8),
-      "\nNo of variables after setting 0.85 as cut-off: ", ncol(variables_0.85),
-      "\nNo of variables after setting 0.9 as cut-off: ", ncol(variables_0.9))
-'
+    "\nEliminated variables:\n", corr_removed_var)
 
 
 # Variance based Feature Selection ==========
 variances <- data.frame(t(apply(variables_0.8, 2, var)))
-removed_var <- colnames(variances)[which((!abs(variances) > 0))]
+var_removed_var <- colnames(variances)[which((!abs(variances) > 0))]
 data_df <- variables_0.8[,apply(variances, 2,
                                function(x) any(abs(x) > 0, na.rm = TRUE))]
 cat("Variable No. after eliminating variance = 0: ", ncol(data_df),
-    "\nEliminated variables: ", removed_var)
+    "\nEliminated variables: ", var_removed_var)
 
 
 # First description of the variables ==============
@@ -124,8 +117,18 @@ all_sets <- lapply(all_sets, function(dat) {  # Add "type" and "label" column
 })
 all_sets <- do.call(rbind, all_sets)  # Include all tables to the same data frame
 
+# store no of observations in each group
+no_of_obs <- c(table(norm_data$label)[[1]],table(norm_data$label)[[2]],
+               table(train$label)[[1]],table(train$label)[[2]],
+               table(test$label)[[1]],table(test$label)[[2]])
+
+# Bind all data about the proportions
+all_sets <- cbind(all_sets, no_of_obs)
+
+# Create barplot
 prop_table <- ggplot(all_sets,aes(x=Label, y=Freq, fill = Label)) +
   geom_col() + 
+  geom_label( label = all_sets$no_of_obs) +
   facet_wrap(~ type, scales = "free_x")
 prop_table
 
