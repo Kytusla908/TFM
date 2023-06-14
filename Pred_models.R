@@ -57,7 +57,7 @@ NB1_plot <- ggplot(NB_model1) +
   theme(plot.title = element_text(size = 22, hjust = 0.5))
 NB1_plot
 
-# useKernel = TRUE models
+# useKernel = FALSE models
 grid <- expand.grid(usekernel = c(FALSE),
                     laplace = seq(0,1.5, length = 15),
                     adjust = 0)
@@ -68,7 +68,7 @@ NB_model
 
 # Performance plot
 NB_plot <- ggplot(NB_model) +
-  labs(title = "Naive Bayes models' performance", subtitle = "Kernel = TRUE & Laplace = 0") +
+  labs(title = "Naive Bayes models' performance", subtitle = "Kernel = FALSE & Adjust = 0") +
   geom_text(aes(label=round(NB_model[["results"]][["Accuracy"]],3)), vjust = 1.5) +
   theme(plot.title = element_text(size = 22, hjust = 0.5),
         plot.subtitle = element_text(size = 15, hjust = 0.5))
@@ -85,7 +85,7 @@ values_NB_mod
 # Support Vector Machine ===========
 # SVM linear classifier
 set.seed(12345)
-svm_lin_model <- ksvm(label ~ ., data = train[-1], kernel = "vanilladot")
+svm_lin_model <- ksvm(label ~ ., data = train[-1], kernel = "vanilladot", prob.model = T)
 svm_lin_pred <- predict(svm_lin_model, test[-(1:2)])
 table(svm_lin_pred == test[[2]])
 values_lin_mod <- confusionMatrix(svm_lin_pred, test[[2]], 
@@ -101,7 +101,7 @@ values_rbf_mod <- confusionMatrix(svm_rbf_pred, test[[2]],
 
 # SVM with Polynomial Kernel
 set.seed(12345)
-svm_poly_model <- ksvm(label ~ ., data = train[-1], kernel = "polydot")
+svm_poly_model <- ksvm(label ~ ., data = train[-1], kernel = "polydot", prob.model = T)
 svm_poly_pred <- predict(svm_poly_model, test[-(1:2)])
 table(svm_poly_pred == test[[2]])
 values_poly_mod <- confusionMatrix(svm_poly_pred, test[[2]], 
@@ -209,7 +209,7 @@ NB_perform <- performance(NB_predict, measure = "tpr", x.measure = "fpr")
 NB_auc <- performance(NB_predict, measure = "auc")
 
 # SVM model
-SVM_prob <- as.data.frame(predict(svm_rbf_model, test[-(1:2)], type = "prob"))
+SVM_prob <- as.data.frame(predict(svm_lin_model, test[-(1:2)], type = "prob"))
 SVM_predict <- prediction(predictions = SVM_prob[2],
                           labels = test[[2]])
 SVM_perform <- performance(SVM_predict, measure = "tpr", x.measure = "fpr")
